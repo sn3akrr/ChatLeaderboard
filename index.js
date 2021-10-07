@@ -13,7 +13,7 @@ const db = mysql.createConnection({
 
 db.connect((err) => {
   if (err) throw err;
-  console.log("Connected!");
+  console.log("Connected to database!");
 });
 
 const client = new Discord.Client();
@@ -33,9 +33,9 @@ client.once("ready", () => {
 });
 
 client.on("message", message => {
-	console.log(message.content);
+	//console.log(message.content);
 
-	if(message.content.startsWith(prefix) && message.content.length >= 4){
+	if(message.content.startsWith(prefix) && message.content.length >= 4) {
 		//command handling
 		const args = message.content.slice(prefix.length).split(/ +/);
 		const command = args.shift().toLowerCase();
@@ -81,6 +81,14 @@ client.on("message", message => {
 		}
 	}else{
 		//message logging
+		let id = message.author.id;
+		let channelId = message.channel.id;
+		let time = Date.now();
+		db.query("INSERT INTO messages(snowflake, channelId, messageCount, lastMessageTime) VALUES(" + id +", " + channelId + ", 1, " + time + ") ON DUPLICATE KEY UPDATE messageCount=messageCount+1, lastMessageTime=" + time, (error, rows) => {
+			if (error) throw error;
+
+			console.log("Message has been logged for user with snowflake" + id);
+		});
 	}
 });
 

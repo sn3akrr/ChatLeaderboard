@@ -3,20 +3,20 @@ module.exports = {
 	description: "Runs admin commands and stuff like that",
 	admin: true,
 	execute(message, args, db) {
-		if(args.length > 1){
-			message.reply("TODO");
+		typeof(args);
+		if(args.length > 0){
+			subcmd = args.shift();
+			switch(subcmd) {
+				case "test":
+					message.reply("Meatball");
+					break;
+				default:
+					message.reply("Unknown subcommand provided.");
+					break;
+			}
+			//message.reply("TODO");
 		}else{
-			message.delete().then(
-				() => message.reply("Usage: ^admin <insert subcommand list>").then(
-					msg => {
-						try{
-							msg.delete({timeout:5000})
-						}catch(error){
-							console.log(error);
-						}
-					}
-				)
-			);
+			message.reply("Usage: ^admin <insert subcommand list>");
 		}
 	},
 };
