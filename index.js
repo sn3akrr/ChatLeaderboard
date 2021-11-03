@@ -11,6 +11,11 @@ const db = mysql.createConnection({
 	database: "project"
 });
 
+const settings = {
+	prefix: ".",
+	linesPerLeaderboard: 5
+};
+
 db.connect((err) => {
   if (err) throw err;
   console.log("Connected to database!");
@@ -44,12 +49,12 @@ client.on("message", message => {
 			let cmd = client.commands.get(command);
 			let admin = cmd.admin;
 			if(admin == false){
-				cmd.execute(message, args, db);
+				cmd.execute(message, args, prefix, settings, db);
 				//message.reply("Executed player command");
 			}else{		
 				let allowed = message.guild.roles.cache.find(role => role.name === "Admin");
 				if((message.author.bot && "bot" in cmd) || message.member.roles.cache.has(allowed.id)){
-					cmd.execute(message, args, db);
+					cmd.execute(message, args, prefix, settings, db);
 					//message.reply("Executed admin command");
 				}else{
 					message.delete().then(
@@ -84,10 +89,10 @@ client.on("message", message => {
 		let id = message.author.id;
 		let channelId = message.channel.id;
 		let time = Date.now();
-		db.query("INSERT INTO messages(snowflake, channelId, messageCount, lastMessageTime) VALUES(" + id +", " + channelId + ", 1, " + time + ") ON DUPLICATE KEY UPDATE messageCount=messageCount+1, lastMessageTime=" + time, (error, rows) => {
+		db.query("INSERT INTO messages(snowflake, channelId, messageCount, lastMessageTime) VALUES(" + id + ", " + channelId + ", 1, " + time + ") ON DUPLICATE KEY UPDATE messageCount=messageCount+1, lastMessageTime=" + time, (error, rows) => {
 			if (error) throw error;
 
-			console.log("Message has been logged for user with snowflake" + id);
+			console.log("Message has been logged for user with snowflake " + id);
 		});
 	}
 });

@@ -3,6 +3,6 @@ module.exports = {
 	description: "Beep!",
 	admin: false,
 	execute(message) {
-		message.channel.send("Boop.");
+		message.channel.send("Boop. " + message.author.id);
 	},
 };
