@@ -2,7 +2,7 @@ module.exports = {
     name: "leaderboard",
     description: "Display leaderboards",
     admin: false,
-    execute(message, args, prefix, settings, db) {
+    execute(message, args, settings, db) {
         channelId = message.channel.id;
         if(args.length > 0){
             subcmd = args.shift();
@@ -68,11 +68,11 @@ module.exports = {
                     });
                     break;
                 default:
-                    message.reply("Usage: " + prefix + "leaderboard <here/all>");
+                    message.reply("Usage: " + settings.prefix + "leaderboard <here/all>");
                     break;
             }
         }else{
-            message.reply("Usage: " + prefix + "leaderboard <here/all>");
+            message.reply("Usage: " + settings.prefix + "leaderboard <here/all>");
         }
     },
 };

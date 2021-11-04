@@ -31,8 +31,6 @@ for(const file of files){
 	client.commands.set(command.name, command);
 }
 
-const prefix = ".";
-
 client.once("ready", () => {
 	console.log("Ready!");
 });
@@ -40,21 +38,21 @@ client.once("ready", () => {
 client.on("message", message => {
 	//console.log(message.content);
 
-	if(message.content.startsWith(prefix) && message.content.length >= 4) {
+	if(message.content.startsWith(settings.prefix) && message.content.length >= 4) {
 		//command handling
-		const args = message.content.slice(prefix.length).split(/ +/);
+		const args = message.content.slice(settings.prefix.length).split(/ +/);
 		const command = args.shift().toLowerCase();
 
 		try{
 			let cmd = client.commands.get(command);
 			let admin = cmd.admin;
 			if(admin == false){
-				cmd.execute(message, args, prefix, settings, db);
+				cmd.execute(message, args, settings, db);
 				//message.reply("Executed player command");
 			}else{		
 				let allowed = message.guild.roles.cache.find(role => role.name === "Admin");
 				if((message.author.bot && "bot" in cmd) || message.member.roles.cache.has(allowed.id)){
-					cmd.execute(message, args, prefix, settings, db);
+					cmd.execute(message, args, settings, db);
 					//message.reply("Executed admin command");
 				}else{
 					message.delete().then(
@@ -86,14 +84,16 @@ client.on("message", message => {
 		}
 	}else{
 		//message logging
-		let id = message.author.id;
-		let channelId = message.channel.id;
-		let time = Date.now();
-		db.query("INSERT INTO messages(snowflake, channelId, messageCount, lastMessageTime) VALUES(" + id + ", " + channelId + ", 1, " + time + ") ON DUPLICATE KEY UPDATE messageCount=messageCount+1, lastMessageTime=" + time, (error, rows) => {
-			if (error) throw error;
+		if(!message.author.bot){
+			let id = message.author.id;
+			let channelId = message.channel.id;
+			let time = Date.now();
+			db.query("INSERT INTO messages(snowflake, channelId, messageCount, lastMessageTime) VALUES(" + id + ", " + channelId + ", 1, " + time + ") ON DUPLICATE KEY UPDATE messageCount=messageCount+1, lastMessageTime=" + time, (error, rows) => {
+				if (error) throw error;
 
-			console.log("Message has been logged for user with snowflake " + id);
-		});
+				console.log("Message has been logged for user with snowflake " + id);
+			});
+		}
 	}
 });
 
