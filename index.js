@@ -88,6 +88,15 @@ client.on("message", message => {
 			let id = message.author.id;
 			let channelId = message.channel.id;
 			let time = Date.now();
+
+			const blacklist = JSON.parse(fs.readFileSync('./blacklist.json').toString());
+			if (blacklist[id] !== undefined) {
+				if (blacklist[id][channelId] !== undefined) {
+					console.log("user is blocked from this channel");
+					return;
+				}
+			}
+
 			db.query("INSERT INTO messages(snowflake, channelId, messageCount, lastMessageTime) VALUES(" + id + ", " + channelId + ", 1, " + time + ") ON DUPLICATE KEY UPDATE messageCount=messageCount+1, lastMessageTime=" + time, (error, rows) => {
 				if (error) throw error;
 
